@@ -17,7 +17,7 @@ extension Defaults.CodableBridge {
 			let data = try jsonEncoder.encode(value)
 			return String(data: data, encoding: .utf8)
 		} catch {
-			print(error)
+			runtimeWarn(false, "Failed to serialize value for Defaults: \(error)")
 			return nil
 		}
 	}
@@ -27,7 +27,12 @@ extension Defaults.CodableBridge {
 			return nil
 		}
 
-		return try? Value(jsonString: object)
+		do {
+			return try Value(jsonString: object)
+		} catch {
+			runtimeWarn(false, "Failed to deserialize value for Defaults: \(error)")
+			return nil
+		}
 	}
 }
 
