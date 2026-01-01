@@ -55,6 +55,7 @@ final class LifetimeAssociation {
 		}
 	}
 
+	private static let lock: Lock = .make()
 	private static let associatedObjects = ObjectAssociation<[ObjectLifetimeTracker]>()
 	private weak var wrappedObject: ObjectLifetimeTracker?
 	private weak var owner: AnyObject?
@@ -88,8 +89,10 @@ final class LifetimeAssociation {
 	init(of target: AnyObject, with owner: AnyObject, deinitHandler: @escaping () -> Void = {}) {
 		let wrappedObject = ObjectLifetimeTracker(for: target, deinitHandler: deinitHandler)
 
-		let associatedObjects = Self.associatedObjects[owner] ?? []
-		Self.associatedObjects[owner] = associatedObjects + [wrappedObject]
+		Self.lock.with {
+			let associatedObjects = Self.associatedObjects[owner] ?? []
+			Self.associatedObjects[owner] = associatedObjects + [wrappedObject]
+		}
 
 		self.wrappedObject = wrappedObject
 		self.owner = owner
@@ -110,15 +113,23 @@ final class LifetimeAssociation {
 	private func invalidate() {
 		guard
 			let owner,
-			let wrappedObject,
-			var associatedObjects = Self.associatedObjects[owner],
-			let wrappedObjectAssociationIndex = associatedObjects.firstIndex(where: { $0 === wrappedObject })
+			let wrappedObject
 		else {
 			return
 		}
 
-		associatedObjects.remove(at: wrappedObjectAssociationIndex)
-		Self.associatedObjects[owner] = associatedObjects
+		Self.lock.with {
+			guard
+				var associatedObjects = Self.associatedObjects[owner],
+				let wrappedObjectAssociationIndex = associatedObjects.firstIndex(where: { $0 === wrappedObject })
+			else {
+				return
+			}
+
+			associatedObjects.remove(at: wrappedObjectAssociationIndex)
+			Self.associatedObjects[owner] = associatedObjects
+		}
+
 		self.owner = nil
 	}
 }
