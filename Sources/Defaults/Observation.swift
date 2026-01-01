@@ -60,10 +60,8 @@ extension Defaults {
 		let oldValue: Any?
 
 		init(change: [NSKeyValueChangeKey: Any]) {
-			if
-				let kindValue = change[.kindKey] as? UInt,
-				let kind = NSKeyValueChange(rawValue: kindValue)
-			{
+			if let kindValue = change[.kindKey] as? UInt,
+			   let kind = NSKeyValueChange(rawValue: kindValue) {
 				self.kind = kind
 			} else {
 				self.kind = .setting
