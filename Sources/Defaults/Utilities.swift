@@ -258,6 +258,11 @@ class Lock: DefaultsLockProtocol {
 			_lock.initialize(to: os_unfair_lock())
 		}
 
+		deinit {
+			_lock.deinitialize(count: 1)
+			_lock.deallocate()
+		}
+
 		override func lock() {
 			os_unfair_lock_lock(_lock)
 		}
