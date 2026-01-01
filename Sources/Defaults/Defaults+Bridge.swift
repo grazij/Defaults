@@ -101,7 +101,7 @@ extension Defaults {
 			do {
 				return try NSKeyedUnarchiver.unarchivedObject(ofClass: Value.self, from: object)
 			} catch {
-				print(error)
+				runtimeWarn(false, "Failed to deserialize NSSecureCoding value for Defaults: \(error)")
 				return nil
 			}
 		}
