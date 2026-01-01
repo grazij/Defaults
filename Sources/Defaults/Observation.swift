@@ -60,7 +60,14 @@ extension Defaults {
 		let oldValue: Any?
 
 		init(change: [NSKeyValueChangeKey: Any]) {
-			self.kind = NSKeyValueChange(rawValue: change[.kindKey] as! UInt)!
+			if
+				let kindValue = change[.kindKey] as? UInt,
+				let kind = NSKeyValueChange(rawValue: kindValue)
+			{
+				self.kind = kind
+			} else {
+				self.kind = .setting
+			}
 			self.indexes = change[.indexesKey] as? IndexSet
 			self.isPrior = change[.notificationIsPriorKey] as? Bool ?? false
 			self.oldValue = change[.oldKey]
