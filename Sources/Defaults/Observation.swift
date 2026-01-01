@@ -122,8 +122,10 @@ extension Defaults {
 
 		let key = preventPropagationThreadDictionaryKey
 		Thread.current.threadDictionary[key] = true
+		defer {
+			Thread.current.threadDictionary[key] = false
+		}
 		closure()
-		Thread.current.threadDictionary[key] = false
 	}
 
 	final class SuiteKeyPair: Hashable {
