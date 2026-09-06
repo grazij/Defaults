@@ -26,7 +26,7 @@ let package = Package(
 		)
 	],
 	dependencies: [
-		.package(url: "https://github.com/swiftlang/swift-syntax", from: "602.0.0")
+		.package(url: "https://github.com/swiftlang/swift-syntax", "600.0.0"..<"606.0.0")
 	],
 	targets: [
 		.target(
@@ -41,7 +41,6 @@ let package = Package(
 		.macro(
 			name: "DefaultsMacrosDeclarations",
 			dependencies: [
-				"Defaults",
 				.product(name: "SwiftSyntaxMacros", package: "swift-syntax"),
 				.product(name: "SwiftCompilerPlugin", package: "swift-syntax")
 			]
